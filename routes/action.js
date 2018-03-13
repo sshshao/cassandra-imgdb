@@ -7,7 +7,7 @@ exports.deposit = function(req, res) {
         var query = 'INSERT INTO imgs (filename, contents) VALUES (?, ?)';
         var params = [req.body.filename, req.body.contents];
         client.execute(query, params, { prepare: true }, function(err, result) {
-            assert.ifError(err);
+            if(err) throw err;
             console.log(result);
             res.send({
                 'status': 'END'
@@ -17,11 +17,11 @@ exports.deposit = function(req, res) {
 }
 
 exports.retrieve = function(req, res) {
-    if(req.params.filename != null) {
+    if(req.query.filename != null) {
         var query = 'SELECT filename, contents FROM imgs WHERE filename = ?';
-        client.execute(query, [req.params.filename], function(err, result) {
-            assert.ifError(err);
-            if(result.rows == 1) {
+        client.execute(query, [req.query.filename], function(err, result) {
+            if(err) throw err;
+            if(result.rows.length == 1) {
                 console.log('[*]filename %s', result.rows[0].filename);
                 console.log('[*]contents %s', result.rows[0].contents);
                 res.send({

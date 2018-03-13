@@ -3,15 +3,23 @@ const client = new cassandra.Client({ contactPoints: ['127.0.0.1:9042'], keyspac
 
 
 exports.deposit = function(req, res) {
-    if(req.body.filename != null && req.body.contents != null) {
+    console.log(req.body);
+    console.log(req.file);
+    
+    if(req.body.filename != null && req.file != null) {
         var query = 'INSERT INTO imgs (filename, contents) VALUES (?, ?)';
-        var params = [req.body.filename, req.body.contents];
+        var params = [req.body.filename, req.file];
         client.execute(query, params, { prepare: true }, function(err, result) {
             if(err) throw err;
             console.log(result);
             res.send({
                 'status': 'END'
             });
+        });
+    }
+    else {
+        res.send({
+            'status': 'PARAM ERROR'
         });
     }
 }

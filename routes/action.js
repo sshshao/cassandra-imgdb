@@ -26,13 +26,19 @@ exports.deposit = function(req, res) {
 
 exports.retrieve = function(req, res) {
     if(req.query.filename != null) {
-        var query = 'SELECT filename, blobAsText(contents) FROM imgs WHERE filename = ?';
+        var query = 'SELECT filename, contents FROM imgs WHERE filename = ?';
         client.execute(query, [req.query.filename], function(err, result) {
             if(err) throw err;
             if(result.rows.length == 1) {
                 var filename = result.rows[0].filename;
                 var contents = JSON.parse(result.rows[0].contents);
-                res.setHeader('content-type', contents.mimetype);
+
+                if(contents.mimetype == 'image/jpg') {
+                    res.setHeader('content-type', 'image/jpeg');
+                }
+                else {                
+                    res.setHeader('content-type', contents.mimetype);
+                }
                 res.send({
                     'status': 'OK',
                     'filename': filename,

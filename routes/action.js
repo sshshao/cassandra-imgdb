@@ -7,8 +7,8 @@ exports.deposit = function(req, res) {
     console.log(req.file);
     
     if(req.body.filename != null && req.file != null) {
-        var query = 'INSERT INTO imgs (filename, contents) VALUES (?, ?)';
-        var params = [req.body.filename, req.file];
+        var query = 'INSERT INTO imgs (filename, contents) VALUES (?, textAsBlob(?))';
+        var params = [req.body.filename, JSON.stringify(req.file)];
         client.execute(query, params, { prepare: true }, function(err, result) {
             if(err) throw err;
             console.log(result);
@@ -26,7 +26,7 @@ exports.deposit = function(req, res) {
 
 exports.retrieve = function(req, res) {
     if(req.query.filename != null) {
-        var query = 'SELECT filename, contents FROM imgs WHERE filename = ?';
+        var query = 'SELECT filename, blobAsText(contents) FROM imgs WHERE filename = ?';
         client.execute(query, [req.query.filename], function(err, result) {
             if(err) throw err;
             if(result.rows.length == 1) {

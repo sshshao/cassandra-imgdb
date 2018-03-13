@@ -7,15 +7,19 @@ exports.deposit = function(req, res) {
         var query = 'INSERT INTO imgs (filename, contents) VALUES (?, ?)';
         var params = [req.body.filename, req.body.contents];
         client.execute(query, params, { prepare: true }, function(err, result) {
+            assert.ifError(err);
             console.log(result);
+            res.send({
+                'status': 'END'
+            });
         });
     }
 }
 
 exports.retrieve = function(req, res) {
-    if(req.body.filename != null) {
+    if(req.params.filename != null) {
         var query = 'SELECT filename, contents FROM imgs WHERE filename = ?';
-        client.execute(query, [req.body.filename], function(err, result) {
+        client.execute(query, [req.params.filename], function(err, result) {
             assert.ifError(err);
             if(result.rows == 1) {
                 console.log('[*]filename %s', result.rows[0].filename);
@@ -33,7 +37,7 @@ exports.retrieve = function(req, res) {
     }
     else {
         res.send({
-            'status': 'ERROR'
+            'status': 'PARAM ERROR'
         });
     }
 }

@@ -30,10 +30,13 @@ exports.retrieve = function(req, res) {
         client.execute(query, [req.query.filename], function(err, result) {
             if(err) throw err;
             if(result.rows.length == 1) {
-                console.log('[*]filename %s', result.rows[0].filename);
-                console.log('[*]contents %s', result.rows[0].contents);
+                var filename = result.rows[0].filename;
+                var contents = JSON.parse(result.rows[0].contents);
+                res.setHeader('content-type', contents.mimetype);
                 res.send({
-                    'status': 'OK'
+                    'status': 'OK',
+                    'filename': filename,
+                    'contents': contents
                 });
             }
             else {

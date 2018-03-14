@@ -8,16 +8,16 @@ exports.deposit = function(req, res) {
     
     if(req.body.filename != null && req.file != null) {
         var filename = req.body.filename;
-        var data = req.file.buffer.toString('ascii');
+        var data = req.file.buffer.toString('base64');
         var type = req.file.mimetype;
-
+        
         var params = [filename, type, data];
         var query = 'INSERT INTO imgs (filename, type, contents) VALUES (?, ?, textAsBlob(?))';
         client.execute(query, params, { prepare: true }, function(err, result) {
             if(err) throw err;
-            res.setHeader('content-type', type);
-            console.log("SENDING " + new Buffer(data, 'ascii'));
-            res.end(new Buffer(data, 'ascii'));
+            res.send({
+                'status': 'OK'
+            });
         });
     }
     else {
@@ -34,11 +34,10 @@ exports.retrieve = function(req, res) {
             if(err) throw err;
             if(result.rows.length == 1) {
                 var mimetype = result.rows[0].type;
-                var contents = result.rows[0].contents;
-                console.log("RETROEVED" + contents);
+                var contents = result.rows[0].contents.toString('binary');
 
                 res.setHeader('content-type', mimetype);
-                res.end(contents, 'ascii');
+                res.end(new Buffer(contents, 'base64'));
             }
             else {
                 res.send({

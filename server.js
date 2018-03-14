@@ -25,7 +25,7 @@ app.use(function(req, res, next) {
 
 http.createServer(app).listen(8080);
 
-var upload = multer({ dest: 'uploads/' });
+var upload = multer({ storage: multer.memoryStorage() });
 router.post('/deposit', upload.single('contents'), action.deposit);
 router.get('/retrieve', action.retrieve);
 
